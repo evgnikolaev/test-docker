@@ -1,5 +1,7 @@
 /*
 https://www.youtube.com/watch?app=desktop&v=_uZQtRyF6Eg
+https://www.youtube.com/watch?app=desktop&v=O8N1lvkIjig  !!!!
+
 
 
 Почему стоит использовать Docker
@@ -27,9 +29,6 @@ https://www.youtube.com/watch?app=desktop&v=_uZQtRyF6Eg
 	на Маке или Windows - создается виртуальная машина линукса, нужно установить Docker Desktop.
 
 
-Строение образа    -  образ состоит из слоев:		Базовый слой,  слой 1,  слой 2
-
-
 
 
 
@@ -39,16 +38,65 @@ https://www.youtube.com/watch?app=desktop&v=_uZQtRyF6Eg
     docker ps       - список запущенных контейнеров
 
     docker images   - список локальных образов
+    docker rmi "id" или "имя" - удалить образ
+
 
     docker pull hello-world         - просто скачает
-    docker run hello-world          - создает и запускает контейнер. Если локально не найдет, скачает с DockerHub. Создаются всегда новые контейнеры.
-    docker run hello-world:7.4.1    - скачает с определенным тегом
+    docker start  "id" или "имя"    - запускает контейнер, который уже скачан
 
-    docker rm 5c9650b60da9      - удалить контейнер
-    docker rm zen_kepler        - удалить контейнер
+    docker rm  "id" или "имя"      - удалить контейнер
+    docker container prune - удалить остановленные контейнеры
+
+    docker stop "id" или "имя"          - остановить контейнер
+    docker kill  "id" или "имя"         - если docker stop не сработал
+    docker pause  "id" или "имя"        - поставить работающий контейнер на паузу
+    docker unpause  "id" или "имя"      - убрать паузу
+    docker stats  "id" или "имя"        - посмотреть сколько ресурсов, памяти занимает контейнер
+    docker logs -f  "id" или "имя"      - смотреть логи контейнера ( -f постоянно обновляющиеся )
 
 
-    docker run -it busybox      - подключаюсь к оболочке sh
+
+    docker container inspect "id" или "имя"     - детали контейнера
+    docker container inspect 943fc656e7cf | grep IPAddress  - фильтруем детали, дай только ip адрес
+
+
+
+    docker exec -it nginx("id" или "имя") bash     - запуск процесса внутри контейнера, зайти и изменить что-то в контейнере
+                                                        exec - выполняет команду в запущенном контейнере
+                                                        it - опции подключения интерактивного терминала
+                                                        bash - название процесса
+
+                                                        попадаем в оболочку bash, можем посмотреть файл index.html который отдается nginx-ом
+                                                        cd /usr/share/nginx/html
+                                                        cat index.html
+
+
+
+
+
+
+
+    docker run
+
+
+        Если команда длинная можно разбивать ее обратным слешем:
+
+              docker run \
+              -- name my_nginx \
+              -v ${PWD}/nginx:/usr/share/nginx/html \
+              -p 8080:80 \
+              -d \
+              --rm \
+              nginx
+
+
+
+
+        docker run hello-world                        - создает и запускает контейнер. Если локально не найдет, скачает с DockerHub. Создаются всегда новые контейнеры.
+        docker run hello-world:7.4.1 echo "Hello"     - скачает с определенным тегом, также вместе можно передать команду echo "Hello"
+
+
+             - подключаюсь к оболочке sh
                                             i - интерактивный
                                             t - терминал
 
@@ -60,65 +108,36 @@ https://www.youtube.com/watch?app=desktop&v=_uZQtRyF6Eg
                                         exit                - выход из терминала
 
 
-    docker container prune - удалить остановленные контейнеры
-
-
-
-    docker run -d --name my_nginx nginx     - запуск контейнера в фоновом режиме
-                                                без флага -d контейнер запускается, не завершается. мы находимся в запущенном nginx
-                                                -d  - отсоединенный
-                                                --name my_nginx - создаем имя контейнеру
-
-
-    docker container inspect "id" или "имя"     - детали контейнера
-    docker container inspect 943fc656e7cf | grep IPAddress  - фильтруем детали, дай только ip адрес
-
-    docker stop "id" или "имя"      - остановить контейнер
-    docker kill                     - если docker stop не сработал
-
-    docker exec -it nginx("id" или "имя") bash     - запуск процесса внутри контейнера
-                                                        exec - выполняет команду в запущенном контейнере
-                                                        it - опции подключения интерактивного терминала
-                                                        bash - название процесса
-
-                                                        попадаем в оболчку bash, можем посмотреть файл index.html который отдается nginx-ом
-                                                        cd /usr/share/nginx/html
-                                                        cat index.html
-
-
-
-    docker run -p 8080:80 nginx     - Маппинг портов - проброс портов. Ее делает докер
-                                        -p - publish публикация порта
-                                        8080 - внешний порт
-                                        80 - порт контейнера
-
-                                        В браузере на компе можно открыть страницу из контейнера http://localhost:8080/
+        docker run -it --rm busybox
+                                    --rm - автоматическое удаление остановленных контейнеров, чтобы тут   docker ps -a   их не видеть
 
 
 
 
-    docker run -v ${PWD}/nginx:/usr/share/nginx/html nginx    - Маппинг томов - пробрасываем свой файл в контейнер
-                                                                    -v  - volume подключение тома
-                                                                    ${PWD} - путь к локальной папке (переменная - абсолютный путь к текущей папке. в командной строке можно ввести для проверки echo ${PWD} )
-                                                                    /usr/share/nginx/html     - путь к папке внутри контейнера
-
-
-
-    docker run -it --rm busybox
-                                --rm - автоматическое удаление остановленных контейнеров, чтобы тут   docker ps -a   их не видеть
+        docker run -d --name my_nginx nginx     - запуск контейнера в фоновом режиме
+                                                    без флага -d контейнер запускается, не завершается. мы находимся в запущенном nginx
+                                                    -d  - отсоединенный
+                                                    --name my_nginx - создаем имя контейнеру
 
 
 
 
-    Если команда длинная можно разбивать ее обратным слешем:
 
-          docker run \
-          -- name my_nginx \
-          -v ${PWD}/nginx:/usr/share/nginx/html \
-          -p 8080:80 \
-          -d \
-          --rm \
-          nginx
+
+        Маппинг портов
+
+                netstat -tulnp      - посмотреть какие порты открыты в linux
+                sudo lsof -i -P     - посмотреть какие порты открыты на маке
+
+
+
+
+                docker run -p 8080:80 nginx     - Маппинг портов - проброс портов. Ее делает докер
+                                                    -p - publish публикация порта
+                                                    8080 - внешний порт
+                                                    80 - порт контейнера
+
+                                                    В браузере на компе можно открыть страницу из контейнера http://localhost:8080/
 
 
 
@@ -126,6 +145,101 @@ https://www.youtube.com/watch?app=desktop&v=_uZQtRyF6Eg
 
 
 
+
+        Переменные
+
+
+                docker run -e MYSQL_ROOT_PASSWORD=qwerty123 mysql
+                                                    -e - Системные переменные
+                                                            Посмотреть можем подключившись к контейнеру:
+                                                            docker exec -it ... /bin/bash
+                                                            env - командой линукса
+
+
+                                                        Можно сразу подклюиться к mysql командой
+                                                            docker exec -it ... mysql -uroot -p
+
+
+
+
+
+
+        Volumes
+
+
+            docker volume ls   - посмотреть какие volume есть
+            docker volume rm  ... - удалить  volume
+
+            docker run -p 8080:80 -v ${PWD}/1/nginx:/usr/share/nginx/html:ro nginx    - Маппинг томов - пробрасываем свой файл в контейнер
+                                                                                            -v  - volume подключение тома
+                                                                                            ${PWD} - путь к локальной папке (переменная - абсолютный путь к текущей папке. в командной строке можно ввести для проверки echo ${PWD} )
+                                                                                            /usr/share/nginx/html     - путь к папке внутри контейнера
+                                                                                            :ro - read only, контейнер не имеет прав изменять что-то в этой директории, он имеет права только на чтение
+
+
+            docker run -p 8080:80 -v usr/share/nginx/html nginx    - анонимный, так не запускаем, при удалении контейнера, volume тоже удаляется
+
+            docker run -p 8081:80 -v web_data:/usr/share/nginx/html nginx    - именной volume, он сохраняется (путь - 1_Типы_Volumes.png )
+
+
+
+
+
+        Сетевые настройки
+            Типы:
+                - bridge (мостик)
+                - host
+                - none
+                - macvlan
+                - ipvlan
+
+
+
+            ip a                                                        - просмотр сетевых интерфейсов на linux
+            ifconfig                                                    - просмотр сетевых интерфейсов на маке
+
+            docker network ls                                           - просмотр типов сетей
+            docker network inspect NAME                                 - посмотреть инфо о сети
+            docker network rm NAME                                      - удалить сеть
+            docker run -it --net NAME nicolaka/netshoot /bin/bash       - образ анализа сетей
+                                                                                    --net NAME  - запустить в созданной сети
+                                                                                    --net host  - запустить в сети host
+
+            docker network connect NAME "id" или "имя контейнера"       - подключить, добавить сеть работающему контейнера
+            docker network disconnect NAME "id" или "имя контейнера"    - отключить, убрать сеть работающего контейнера
+
+
+
+
+            Создать сеть
+                docker network create NAME
+                docker network create --driver bridge --subnet 192.168.10.0/24 --gateway 192.168.10.1 NAME
+
+                                                             --driver bridge  можно пропустить, она по умолчанию bridge
+                                                             host, null - создать еще мы не сможем, будет только одна
+
+
+                                                             --subnet 192.168.10.0/24 - можно создать свю подсеть со своими ip-адресами
+                                                             --gateway 192.168.10.1 - куда будут идти наши пакеты
+
+
+
+                docker network create --driver macvlan --subnet 10.10.10.0/24 --gateway 10.10.10.1 --ip-range 10.10.10.193/32  -o parent=ens18  NAME
+                                                             - пример сети macvlan
+                                                             --ip-range 10.10.10.193/32  - указываем конкретный ip для сети (то есть к нему можно напрямую делать  ping извне)
+                                                             -o parent=ens18  - опция, с чем будет спарена материнская карточка
+
+                docker run -it --ip 10.10.10.213 --net NAME nicolaka/netshoot /bin/bash
+                                                             --ip 10.10.10.213 - в нашей macvlan сети мы можем запускать
+                                                                                 контейнеры с определенным ip-адресом
+
+
+
+
+
+================================
+
+Строение образа    -  образ состоит из слоев:		Базовый слой,  слой 1,  слой 2
 
 
 
@@ -158,6 +272,10 @@ https://www.youtube.com/watch?app=desktop&v=_uZQtRyF6Eg
 
 
 
+
+
+
+================================
 
 
 Docker compose - позволяет запускать, останавливать одновременно несколько контейнеров
