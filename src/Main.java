@@ -234,7 +234,6 @@ https://www.youtube.com/watch?app=desktop&v=O8N1lvkIjig  !!!!
                                                                                  контейнеры с определенным ip-адресом
 
 
-2.30!!!!!!
 
 
 ================================
@@ -248,22 +247,41 @@ https://www.youtube.com/watch?app=desktop&v=O8N1lvkIjig  !!!!
     1. Для создания образа необходимо создать Dockerfile
     2. Обычно Dockerfile помещают в корне папки приложения
     3. Dockerfile содержит инструкции по созданию образа
-    4. При создании обража можно указать имя и тег для образа
+    4. При создании образа можно указать имя и тег для образа
     5. На основании готового образа можно создавать контейнеры
 
 
 
-    FROM python:alpine              - имя, тег базового образа
-    WORKDIR /app                    - рабочая папка для приложения
-    RUN pip install pymongo         - к примеру можно установить доп пакет
-    COPY . .                        - компируем и з локальной папки в папку WORKDIR
-    CMD ["python", "main.py"]       - запускается команда, запускаем python, и он выполнет файл main.py, который мы скопировали на предыдущем шаге
+    FROM ubuntu:22.04               - имя, тег базового образа
+    LABEL author=RomNero            - справочная инфо
+
+    WORKDIR /app                    - рабочая папка для приложения (также в нее попадаем при команде docker exec -it mydocker /bin/bash/ )
+    COPY . .                        - копируем и з локальной папки в папку WORKDIR (можно указывать и полные пути)
+
+
+    RUN apt-get update              - запуск команд
+    RUN apt-get install nginx -y    - -y автоматическое подтверждение при выполнении команды
+
+
+    EXPOSE 80
+    EXPOSE 443/tcp                  - информация, какие порты будет использовать наш контейнер, если использовать команду
+                                            docker run -d --name mydocker -P myimage
+                                            -P (большая) - будет автопроброс портов (только порт на входе будет выбран рандомный автоматически)
 
 
 
-    docker build . -t my-calendar:4.1.3      - запуск процесса создания образа, (переписывает, если теги совпадают)
-                                                . путь к Dockerfile
-                                                -t my-calendar:4.1.3  добавляем имя и тег для образа
+    CMD ["echo", "hello world"]         - изменяемая команда, при запуске контейнера, в execute формате, правильнее
+    ENTRYPOINT  echo "hello world"      - неизменяемая команда, при запуске контейнера
+
+                Разница команд:
+                    CMD echo "hello world"              - мы сможем зайти в интерактив моде в контейнер при запуске     docker run -it --name mydocker myimage /bin/bash   (то есть команду echo "hello world" перезаписали командой  /bin/bash  )
+                    ENTRYPOINT  echo "hello world"      - мы не сможем зайти в интерактив моде в контейнер при запуске  docker run -it --name mydocker myimage /bin/bash   (выведется "hello world")
+
+                Совместное использование:
+                    ENTRYPOINT ["echo"]                 - фиксированная команда, неизменяемая,  в командной строке не перезаписывается
+                    CMD ["hello world"]                 - в командной строке можно перезаписать, изменить команду
+
+                    docker run --name mydocker myimage Hello Romnero     - выведется в консоль Hello Romnero
 
 
 
@@ -272,7 +290,23 @@ https://www.youtube.com/watch?app=desktop&v=O8N1lvkIjig  !!!!
 
 
 
+    Создание образа по Dockerfile
 
+             docker build ./docker -t mydocker:v01     - запуск процесса создания образа, (переписывает, если теги совпадают)
+                                                            . путь к Dockerfile
+                                                             -t mydocker:v01  добавляем имя и тег для образа
+
+                                                                         docker build ./docker              - создать образ по Dockerfile
+                                                                         docker tag "id" mydocker:v01       -  добавляем имя и тег для образа если забыли
+
+
+             docker run mydocker:v01        - создать контейнер
+             docker image inspect           - проинспектировать образ
+
+
+
+
+3 15  !!!!!!!!!!!!!!
 
 
 ================================
