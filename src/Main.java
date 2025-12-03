@@ -254,6 +254,9 @@ https://www.youtube.com/watch?app=desktop&v=O8N1lvkIjig  !!!!
 
     FROM ubuntu:22.04               - имя, тег базового образа
     LABEL author=RomNero            - справочная инфо
+    ENV OWNER=RomNero               - Системные переменные
+                                            RUN echo $OWNER > /opt/info   - эти переменные можно использовать потом bash скриптах (пример script.sh)
+
 
     WORKDIR /app                    - рабочая папка для приложения (также в нее попадаем при команде docker exec -it mydocker /bin/bash/ )
     COPY . .                        - копируем и з локальной папки в папку WORKDIR (можно указывать и полные пути)
@@ -290,6 +293,8 @@ https://www.youtube.com/watch?app=desktop&v=O8N1lvkIjig  !!!!
 
 
 
+
+
     Создание образа по Dockerfile
 
              docker build ./docker -t mydocker:v01     - запуск процесса создания образа, (переписывает, если теги совпадают)
@@ -317,7 +322,7 @@ Docker compose - позволяет запускать, останавливат
 
     Преимущества Docker compose
      - Декларативный подход к созданию контейнеров
-            Императивный подход  - выполнение по командам (dodker run, docker exec ...)
+            Императивный подход  - выполнение по командам (docker run, docker exec ...)
             Декларативный подход - описываем желаемый результат, абстрагируемся от отдельных команд, создаем инструкции более высокого уровня
                                     используем в Docker compose.
 
