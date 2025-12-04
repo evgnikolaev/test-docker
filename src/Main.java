@@ -311,9 +311,6 @@ https://www.youtube.com/watch?app=desktop&v=O8N1lvkIjig  !!!!
 
 
 
-3 15  !!!!!!!!!!!!!!
-
-
 ================================
 
 
@@ -333,33 +330,75 @@ Docker compose - позволяет запускать, останавливат
 
             docker compose down     - остановить контейнеры и удалить
 
+            docker-compose --version    - старая запись
+            docker compose version      - новая запись
+
+
     - Автоматическое создание необходимых образов на основании Dockerfile каждого приложения
     - Автоматическое создание изолированной сети для взаимодействия контейнеров
     - Благодаря DNS возможно взаимодействие между контейнерами, использую имена сервисов
 
 
 
-        Структура docker-compose.yml
+
+
+Структура docker-compose.yml
         задаются с отступами
              списки (с черточками)
              словари
 
 
-         Пример docker-compose.yml
+    Пример docker-compose.yml
 
-                version: '3'                - версия файла
+                version: '3'                                                - версия файла
 
                 services:
-                    app:                    - название сервиса, контейнера (называем сами)
-                        build: ./app        - включает этап создание образа на основании Dockerfile  ( app - тут лежит Dockerfile (относительный путь относительно docker-compose.yml ) )
-                    mongo:                  - название сервиса
-                        image: mongo        - название официального образа
+                    app:                                                    - название сервиса, контейнера (называем сами)
+                        build: ./app                                        - включает этап создание образа на основании Dockerfile  ( app - тут лежит Dockerfile (относительный путь относительно docker-compose.yml ) )
+
+
+
+                    nginx:                                                  - название сервиса
+                        image: nginx                                        - название официального образа
+                        container_name: mynginx                             - имя контейнера
+                        volumes:
+                            - /opt/web/html:/var/www/html
+                            - /opt/web/pics:/var/www/pictures
+
+                        environment:                                        - системные переменны
+                            - NGINX_HOST=web.romnero.de
+                            - NGINC_PORT=80
+
+                        ports:                                              порты
+                            - "80:80"
+                            - "443:443"
+
+                        restart: unless-stopped # always/no/on-failure        - что делать при перезагрузке сервера.
+                                                                                    unless-stopped - Если сервер был включен, при перезагрузке он включится, если был выключен - при перезагрузке выклюится
+                                                                                    always - всегда при перезагрузке запускается
+                        depends_on:
+                            - app                                             - зависим от app, сперва ставим app, потом только nginx
+
+                        networks:                                             - в какой сети работает
+                            - appnet
+
+
+
+                networks:                                                       - список сетей
+                    appnet:
+                        driver:bridge
+                        name:appnet
 
 
 
 
 
 
+
+
+
+
+3 55  !!!!!!!!!!!!!!
 
 
 
