@@ -325,10 +325,11 @@ Docker compose - позволяет запускать, останавливат
 
     - Все необходимые контейнеры запускаются одной командой
             docker compose up                   - запуск
-            docker compose up -d --build        - d detach запустить в фоновом режиме
+            docker compose up -d --build        - d detach запустить в фоновом режиме       (в этом режиме также можно просмотривать логи        docker cpmpose logs -f )
                                                 --build  - пересобрать, перебилдить, если что-то изменили в своем коде. !обязательно использовать
 
             docker compose down     - остановить контейнеры и удалить
+            docker compose stop     - остановить контейнеры и удалить
 
             docker-compose --version    - старая запись
             docker compose version      - новая запись
@@ -364,6 +365,7 @@ Docker compose - позволяет запускать, останавливат
                         volumes:
                             - /opt/web/html:/var/www/html
                             - /opt/web/pics:/var/www/pictures
+                            - nginx-config:/var/www/config                  - именной volume
 
                         environment:                                        - системные переменны
                             - NGINX_HOST=web.romnero.de
@@ -382,6 +384,10 @@ Docker compose - позволяет запускать, останавливат
                         networks:                                             - в какой сети работает
                             - appnet
 
+
+
+                volumes:
+                  nginx-config:                                                 - добавляем список именных volume
 
 
                 networks:                                                       - список сетей
